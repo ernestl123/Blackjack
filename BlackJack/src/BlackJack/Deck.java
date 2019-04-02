@@ -23,11 +23,16 @@ public class Deck
 	public Deck ()
 	{
 		//initialize data - stackOfCards - topCardIndex
-		
-		
+                stackOfCards = new ArrayList<Card>();
+		topCardIndex = NUMCARDS-1;
 		//loop through suits
 			//loop through faces
 				//add in a new card
+                for (int i = 0; i < NUMSUITS; i ++){
+                    for (int j = 1; j <= NUMFACES; j++){
+                        stackOfCards.add(new BlackJackCard(j, SUITS[i]));
+                    }
+                }
 		
 	}
 
@@ -35,23 +40,30 @@ public class Deck
    public void shuffle ()
 	{
 		//shuffle the deck
+            Collections.shuffle(stackOfCards);
 		//reset variables as needed
+            topCardIndex = NUMCARDS;
 	}
 
    //accessors
 	public int  size ()
 	{
-		return 0;
+		return stackOfCards.size();
 	}
 
 	public int numCardsLeft()
 	{
-		return 0;
+            if (topCardIndex < 0){
+                return 0;
+            }
+		return topCardIndex;
 	}
 
 	public Card nextCard()
 	{
-		return stackOfCards.get(topCardIndex--);
+
+            topCardIndex--;
+            return stackOfCards.get(topCardIndex);
 	}
 
 	public String toString()
