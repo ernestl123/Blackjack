@@ -60,6 +60,6 @@ public abstract class AbstractPlayer implements Playerable
    public abstract boolean hit();
    public String toString()
    {
-      return "hand = " + hand.toString() + " \n-  # wins " + winCount;
+      return hand.toString();
    }
 }
