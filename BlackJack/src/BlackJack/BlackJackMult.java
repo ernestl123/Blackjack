@@ -6,18 +6,22 @@
 package BlackJack;
 
 import java.util.Scanner;
-
+import java.util.Collections;
+import java.util.ArrayList;
 /**
  *
  * @author line8847
  */
 public class BlackJackMult {
-    private Playerable[] players;
+    private ArrayList<Playerable> players;
     private static final int amount = 4;
 	public BlackJackMult()
 	{
-            players = new Playerable[amount];
-            players[0] = new Dealer();
+            players = new ArrayList<Playerable>();
+            players.add(new Dealer());
+            for (int i = 1; i <= amount; i ++){
+              players.add(new Player());
+            }
 	}
 
 	public void playGame()
@@ -26,61 +30,104 @@ public class BlackJackMult {
                 deck.shuffle();
 		Scanner keyboard = new Scanner(System.in);
                 char answer;
-                int playerWins = 0;
+                int[] playerWins = new int[amount+1];
+                for (int i = 0; i < amount+1; i++){
+                  playerWins[i] = 0;
+                }
                 int dealerWins = 0;
                 do{
                    
-                
+                    
                     char choice = 'n';
-                    player.addCardToHand(deck.nextCard());
-                    player.addCardToHand(deck.nextCard());
-                    dealer.addCardToHand(deck.nextCard());
-                    dealer.addCardToHand(deck.nextCard());
-                    do{
-                        System.out.println("Current hand: " + player + " Value: "+ player.getHandValue());
+                    for (Playerable p: players){
+                      p.addCardToHand(deck.nextCard());
+                      p.addCardToHand(deck.nextCard());
+                    }
+                    
+                    int temp = 1;
+                    for (Playerable p: players){
+                      System.out.println("Player " + temp);
+                      do{
+                        
+                        System.out.println("Current hand: " + p + " Value: "+ p.getHandValue());
                         System.out.println("Do you want to hit?");
                         choice = keyboard.next().charAt(0);
                         
                         if (choice == 'y'){
-                            player.addCardToHand(deck.nextCard());
+                            p.addCardToHand(deck.nextCard());
                         }
-                        if (player.getHandValue() > 21){
+                        if (p.getHandValue() > 21){
                             break;
                         }
-                    }while(choice != 'n' );
-                    
-                    while (dealer.getHandValue() < 21){
-                        dealer.addCardToHand(deck.nextCard());
+
+                      }while(choice != 'n' );
+                      temp++;
                     }
-                    System.out.println("Player: \nHand Value: " + player.getHandValue() + "\nHand Size: " + player.getHandSize() + "\nCards: " + player);
-                    System.out.println("\n\nDealer: \nHand Value: " + dealer.getHandValue() + "\nHand Size: " + dealer.getHandSize() + "\nCards: " + dealer+"\n\n");
-                    if (player.getHandValue() > 21){
-                        System.out.println("The player busted! Dealer wins!");
-                        dealerWins++;
+                    //Dealer turn
+                    while (players.get(0).getHandValue() <= 21){
+                        players.get(0).addCardToHand(deck.nextCard());
+                    }
+                    for (int i = 1; i <= amount; i++){
+                        System.out.println("Player" + i + ": \nHand Value: " + players.get(i).getHandValue() + "\nHand Size: " + players.get(i).getHandSize() + "\nCards: " + players.get(i));
+                    }
+                  
+                    System.out.println("\n\nDealer: \nHand Value: " + players.get(0).getHandValue() + "\nHand Size: " + players.get(0).getHandSize() + "\nCards: " + players.get(0)+"\n\n");
+                    ArrayList<Integer> values = new ArrayList<Integer>();
+                    
+                    for (Playerable p: players){
+                        if (p.getHandValue() <= 21){
+                            
+                            values.add(p.getHandValue());
+                        }
                         
                     }
-                    else if (dealer.getHandValue() > 21){
-                        System.out.println("The dealer busted! Player wins!");
-                        playerWins++;
+                    int big = Collections.max(values);
+                 
+                    int count = 0;
+                    for (Playerable p: players){
+                        if (p.getHandValue() == big){
+                            if (count == 0){
+                                System.out.println("Dealer wins!");
+                                playerWins[0]++;
+                            }
+                            else{
+                                System.out.println("Player " + count + " wins!");
+                                playerWins[count]++;
+                            }
+                            
+                            break;
+                        }
+                        count++;
                     }
-                    else if (player.getHandValue() > dealer.getHandValue()){
-                        System.out.println("The player has a bigger hand!");
-                        playerWins++;
+                   
+                    
+                    int c = 0;
+                    for (Playerable p: players){
+                        p.setWinCount(playerWins[c]);
+                        if (c == 0){
+                            
+                            System.out.println("Dealer wins: " + p.getWinCount());
+                        }
+                        else{
+                            System.out.println("Player "+ c + " wins: " + p.getWinCount());
+                        }
+                        c++;
                     }
-                    else if (player.getHandValue() < dealer.getHandValue()){
-                        System.out.println("The dealer has a bigger hand!");
-                        dealerWins++;
-                    }
-                    else{
-                        System.out.println("Both dealer and player has the same hand values.");
-                    }
-                    player.setWinCount(playerWins);
-                    dealer.setWinCount(dealerWins);
-                    System.out.println("Player wins: " + player.getWinCount() + "  Dealer wins: " + dealer.getWinCount());
+                        
+                    
+                    
                     System.out.println("Do you want to play again?");
                     answer= keyboard.next().charAt(0);
-                    player.resetHand();
-                    dealer.resetHand();
+                    for (Playerable p: players){
+                        p.resetHand();
+                    }
                     deck.shuffle();
                 }while(answer != 'n');
+        }
+
+        public static void main(String[] args)
+	{
+		BlackJackMult game = new BlackJackMult();
+		game.playGame();
+	}
 }
